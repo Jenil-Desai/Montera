@@ -1,0 +1,16 @@
+{
+  "name": "jenil-desai/monetra",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "jenildesai",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "ramsey/uuid": "*",
+    "vlucas/phpdotenv": "^5.6"
+  }
+}
