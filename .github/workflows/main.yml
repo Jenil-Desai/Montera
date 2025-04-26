@@ -1,17 +1,21 @@
-name: Deploy to InfinityFree
+name: Deploy PHP App to InfinityFree
 
 on:
   push:
     branches:
-      - main  # or 'master' or whatever your branch is
+      - main  # change if needed
 
 jobs:
-  ftp-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      # Install composer dependencies if you prefer to build without committing vendor/
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
 
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
