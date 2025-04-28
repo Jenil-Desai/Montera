@@ -23,7 +23,13 @@
         </div>
 
         <div class="hidden md:block">
-            <a href="signup.php" class="btn-primary">Get Started</a>
+            <?php
+            if ($_SESSION['user_name']) {
+                echo '<a class="btn-primary" href="dashboard.php">' . $_SESSION['user_name'] . '</a>';
+            } else {
+                echo '<a href="signup.php" class="btn-primary">Get Started</a>';
+            }
+            ?>
         </div>
     </nav>
 

@@ -1,3 +1,6 @@
+<?php session_start(); ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -308,6 +311,7 @@
 <!-- Footer -->
 <?php include "layouts/footer.php"; ?>
 
+<?php include "layouts/scripts.php"; ?>
 <script src="assets/js/scripts.js"></script>
 </body>
 </html>

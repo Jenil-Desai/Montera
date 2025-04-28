@@ -1,3 +1,57 @@
+<?php
+require_once 'vendor/autoload.php';
+
+use Ramsey\Uuid\Uuid;
+
+session_start();
+
+// Check if user is already logged in
+if (isset($_SESSION['user_id'])) {
+    header("Location: dashboard.php");
+    exit();
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm-password'];
+    $id = Uuid::uuid4()->toString();
+
+    // Validate input
+    $errors = [];
+
+    if (empty($name) || empty($email) || empty($password)) {
+        $errors[] = "All fields are required";
+    }
+
+    if ($password !== $confirm_password) {
+        $errors[] = "Passwords do not match";
+    }
+
+    // Check if email already exists
+    $con = include 'includes/database.php';
+    $checkStmt = $con->prepare("SELECT * FROM users WHERE email = ?");
+    $checkStmt->bind_param("s", $email);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result();
+
+    if ($result->num_rows > 0) {
+        if (password_verify($password, $result->fetch_assoc()['password'])) {
+            // Password is correct
+            $_SESSION['user_id'] = $id;
+            $_SESSION['user_name'] = $result->fetch_assoc()['name'];
+
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            $errors[] = "Incorrect password";
+        }
+    } else {
+        $errors[] = "No user found with this email";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,6 +131,8 @@
 
 <!-- Footer -->
 <?php include "layouts/footer.php" ?>
+
+<?php include "layouts/scripts.php"; ?>
 
 <!-- JavaScript for Password Toggle and Mobile Menu -->
 <script>

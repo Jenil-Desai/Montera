@@ -5,6 +5,12 @@ use Ramsey\Uuid\Uuid;
 
 session_start();
 
+// Check if user is already logged in
+if (isset($_SESSION['user_id'])) {
+    header("Location: dashboard.php");
+    exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $email = $_POST['email'];
@@ -180,6 +186,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!-- Footer -->
 <?php include "layouts/footer.php" ?>
+
+<?php include "layouts/scripts.php"; ?>
 
 <!-- JavaScript for Password Toggle, Strength Meter -->
 <script>
