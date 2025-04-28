@@ -1,3 +1,61 @@
+<?php
+require_once 'vendor/autoload.php';
+
+use Ramsey\Uuid\Uuid;
+
+session_start();
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm-password'];
+    $id = Uuid::uuid4()->toString();
+
+    // Validate input
+    $errors = [];
+
+    if (empty($name) || empty($email) || empty($password)) {
+        $errors[] = "All fields are required";
+    }
+
+    if ($password !== $confirm_password) {
+        $errors[] = "Passwords do not match";
+    }
+
+    // Check if email already exists
+    $con = include 'includes/database.php';
+    $checkStmt = $con->prepare("SELECT * FROM users WHERE email = ?");
+    $checkStmt->bind_param("s", $email);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $errors[] = "Email already registered";
+    }
+
+    if (empty($errors)) {
+        // Hash password
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        // Insert user
+        $stmt = $con->prepare("INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $id, $name, $email, $hashed_password);
+
+        if ($stmt->execute()) {
+            // Successfully registered
+            $_SESSION['user_id'] = $id;
+            $_SESSION['user_name'] = $name;
+
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            $errors[] = "Registration failed: " . $con->error;
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,8 +74,23 @@
                 <p class="text-gray-600">Join Monetra and take control of your finances</p>
             </div>
 
+            <?php if (!empty($errors)): ?>
+                <?php foreach ($errors as $error): ?>
+                    <div role="alert" class="mb-4 relative flex w-full p-3 text-sm text-white bg-red-600 rounded-md">
+                        <?php echo htmlspecialchars($error); ?>
+                        <button class="flex items-center justify-center transition-all w-8 h-8 rounded-md text-white hover:bg-white/10 active:bg-white/10 absolute top-1.5 right-1.5"
+                                type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor" class="h-5 w-5" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+
             <div class="bg-white rounded-2xl shadow-lg p-8 transition-all duration-300">
-                <form action="#" method="POST">
+                <form method="POST">
                     <div class="mb-6">
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                         <div class="relative">
