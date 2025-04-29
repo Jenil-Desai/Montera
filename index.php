@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div class="md:w-1/2">
-                <img src="/placeholder.svg?height=400&width=500" alt="Monetra Dashboard Preview"
+                <img src="assets/images/dashboard.jpeg" alt="Monetra Dashboard Preview"
                      class="rounded-lg shadow-xl">
             </div>
         </div>
