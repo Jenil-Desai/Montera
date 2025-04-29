@@ -24,10 +24,10 @@
 
         <div class="hidden md:block">
             <?php
-            if ($_SESSION['user_name']) {
+            if (isset($_SESSION['user_name'])) {
                 echo '<a class="btn-primary" href="dashboard.php">' . $_SESSION['user_name'] . '</a>';
             } else {
-                echo '<a href="signup.php" class="btn-primary">Get Started</a>';
+                echo '<a href="/signup.php" class="btn-primary">Get Started</a>';
             }
             ?>
         </div>

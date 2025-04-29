@@ -14,20 +14,16 @@ if (isset($_SESSION['user_id'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
-    $confirm_password = $_POST['confirm-password'];
     $id = Uuid::uuid4()->toString();
 
     // Validate input
     $errors = [];
 
-    if (empty($name) || empty($email) || empty($password)) {
+    if (empty($email) || empty($password)) {
         $errors[] = "All fields are required";
     }
 
-    if ($password !== $confirm_password) {
-        $errors[] = "Passwords do not match";
-    }
-
+    // Check if email already exists
     // Check if email already exists
     $con = include 'includes/database.php';
     $checkStmt = $con->prepare("SELECT * FROM users WHERE email = ?");
@@ -36,10 +32,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $checkStmt->get_result();
 
     if ($result->num_rows > 0) {
-        if (password_verify($password, $result->fetch_assoc()['password'])) {
+        $user = $result->fetch_assoc(); // Get user data once and store it
+
+        if (password_verify($password, $user['password'])) {
             // Password is correct
-            $_SESSION['user_id'] = $id;
-            $_SESSION['user_name'] = $result->fetch_assoc()['name'];
+            $_SESSION['user_id'] = $user['id']; // Use ID from database
+            $_SESSION['user_name'] = $user['name'];
 
             header("Location: dashboard.php");
             exit();
